@@ -14,18 +14,26 @@ namespace ConnectionPoc
             IConnectionManager connectionManager = new ConnectionManager();
             var connection = await connectionManager.CreateConnectionAsync(principal);
 
-            var parameterBucket = new ParameterBucket();
+            //var parameterBucket = new ParameterBucket();
                         
-            await parameterBucket.InsertAsync(new Parameter { Id = 0, Value = "1" });
-            await parameterBucket.InsertAsync(new Parameter { Id = 1, Value = "2" });
-            await parameterBucket.InsertAsync(new Parameter { Id = 2, Value = "3" });
+            //await parameterBucket.InsertAsync(new Parameter { Id = 0, Value = "1" });
+            //await parameterBucket.InsertAsync(new Parameter { Id = 1, Value = "2" });
+            //await parameterBucket.InsertAsync(new Parameter { Id = 2, Value = "3" });
+
+            var variableBucket = new VariableBucket();
+            await variableBucket.InsertAsync(new Variable { Id = 0, Value = "1" });
+            await variableBucket.InsertAsync(new Variable { Id = 1, Value = "2" });
+            await variableBucket.InsertAsync(new Variable { Id = 2, Value = "3" });
 
             IBucketManager bucketManager = new BucketManager();
-            bucketManager.Add(connection.Id, parameterBucket);
-            
-            var bucketReader = bucketManager.GetReader<Parameter>(connection.Id);
-            
-            var parameters = await GetAllParametersAsync(bucketReader);
+            //bucketManager.Add(connection.Id, parameterBucket);
+            bucketManager.Add(connection.Id, variableBucket);
+
+            //var parameterBucketReader = bucketManager.GetReader<Parameter>(connection.Id);
+            var variableBucketReader = bucketManager.GetReader<Variable>(connection.Id);
+
+            //var parameters = await parameterBucketReader.ReadAllAsync();
+            var variables = await variableBucketReader.ReadAllAsync();
         }
 
         public async Task<IConnection> ConnectToSerial(IPrincipal principal, IConnectionManager connectionManager)

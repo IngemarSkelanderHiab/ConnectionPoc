@@ -5,16 +5,9 @@ using System.Threading.Tasks;
 
 namespace ConnectionPoc
 {
-    public class ParameterBucket : IMessageBucket<Parameter, int>
+    public class ParameterBucket : BaseBucket, IMessageBucket<Parameter, int>
     {
         private IDictionary<int, Parameter> _parameters = new Dictionary<int, Parameter>();
-
-        public int Count => _parameters.Count;
-
-        public IEnumerator<Parameter> GetEnumerator()
-        {
-            throw new System.NotImplementedException();
-        }
 
         public Task InsertAsync(Parameter parameter)
         {

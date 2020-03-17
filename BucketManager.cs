@@ -1,33 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ConnectionPoc
 {
     internal class BucketManager : IBucketManager
     {
-        private IDictionary<int, object> _buckets = new Dictionary<int, object>();
+        private readonly IDictionary<int, BaseBucket> _buckets = new Dictionary<int, BaseBucket>();
 
-        public void Add(int key, object bucket)
+        public void Add(int key, BaseBucket bucket)
         {
             _buckets.Add(key, bucket);
         }
 
         public IBucketReader<T> GetReader<T>(int key)
         {
-            if (typeof(T) == typeof(Parameter))
+            if (!_buckets.ContainsKey(key)) return null;
+            
+            switch (_buckets[key])
             {
-                if (_buckets.ContainsKey(key))
-                {
-                    var bucket = _buckets[key] as ParameterBucket;
-                    if (bucket != null)
-                    {
-                        return (IBucketReader<T>)new ParameterBucketReader(bucket);
-                    }                    
-                }
-                return null;                
+                case ParameterBucket bucket:
+                    return (IBucketReader<T>)new ParameterBucketReader(bucket);
+                case VariableBucket bucket:
+                    return (IBucketReader<T>)new VariableBucketReader(bucket);
+                default:
+                    return null;
             }
-            throw new InvalidOperationException();
         }
     }
 }

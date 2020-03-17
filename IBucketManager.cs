@@ -5,6 +5,6 @@ namespace ConnectionPoc
     public interface IBucketManager
     {
         IBucketReader<T> GetReader<T>(int connectionId);
-        void Add(int key, object bucket);
+        void Add(int key, BaseBucket bucket);
     }
 }
