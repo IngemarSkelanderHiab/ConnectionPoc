@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ConnectionPoc
-{   
-    /// <summary>
-    ///     A message bucket is a place to store and subsequently read previously stored messages.
-    /// </summary>
-    /// <typeparam name="TMessage">The message generic type.</typeparam>
-    /// <typeparam name="TIdentifier">The message identifier generic type.</typeparam>
-    public interface IMessageBucket<TMessage, in TIdentifier>
+{
+    public interface IMessageBucket<TMessage> : IBucket
     {
-        int Count { get; }
         Task<IReadOnlyCollection<TMessage>> ReadAllAsync();
-        Task<TMessage> ReadAsync(TIdentifier identifier);
+        Task<TMessage> ReadAsync(MessageId id);
         Task InsertAsync(TMessage message);
-    }   
+        IBucketReader<TMessage> GetReader();
+    }
 }

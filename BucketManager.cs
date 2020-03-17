@@ -1,33 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ConnectionPoc
 {
-    internal class BucketManager : IBucketManager
+    internal class BucketManager : IBucketManager // Eller basklass, whatever?
     {
-        private IDictionary<int, object> _buckets = new Dictionary<int, object>();
+        private readonly IDictionary<ConnectionId, IList<IBucket>> _buckets = new Dictionary<ConnectionId, IList<IBucket>>();
 
-        public void Add(int key, object bucket)
+        public void Add(ConnectionId key, IBucket bucket)
         {
-            _buckets.Add(key, bucket);
+            IList<IBucket> bucketsWithKey;
+            if (_buckets.ContainsKey(key))
+            {
+                bucketsWithKey = _buckets[key];
+            }
+            else
+            {
+                bucketsWithKey = new List<IBucket>();
+                _buckets.Add(key, bucketsWithKey);
+            }
+
+            bucketsWithKey.Add(bucket);
         }
 
-        public IBucketReader<T> GetReader<T>(int key)
+        public IBucketReader<T> GetReader<T>(ConnectionId key)
         {
-            if (typeof(T) == typeof(Parameter))
+            if (_buckets.ContainsKey(key))
             {
-                if (_buckets.ContainsKey(key))
-                {
-                    var bucket = _buckets[key] as ParameterBucket;
-                    if (bucket != null)
-                    {
-                        return (IBucketReader<T>)new ParameterBucketReader(bucket);
-                    }                    
-                }
-                return null;                
+                var bucketsWithKey = _buckets[key];
+                var bucketOfType = bucketsWithKey
+                    .Single(bucket => bucket is IMessageBucket<T>) as IMessageBucket<T>;
+
+                return bucketOfType.GetReader();
             }
-            throw new InvalidOperationException();
+
+            return new EmptyBucketReader<T>();
         }
     }
 }
