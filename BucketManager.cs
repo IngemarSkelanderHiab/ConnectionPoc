@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ConnectionPoc
 {
-    internal class BucketManager : IBucketManager // Eller basklass, whatever?
+    internal class BucketManager : ISignalBucketManager // Eller basklass, whatever?
     {
         private readonly IDictionary<ConnectionId, IList<IBucket>> _buckets = new Dictionary<ConnectionId, IList<IBucket>>();
 
@@ -23,13 +23,13 @@ namespace ConnectionPoc
             bucketsWithKey.Add(bucket);
         }
 
-        public IBucketReader<T> GetReader<T>(ConnectionId key)
+        public IBucketReader<T, Signal> GetReader<T>(ConnectionId key)
         {
             if (_buckets.ContainsKey(key))
             {
                 var bucketsWithKey = _buckets[key];
                 var bucketOfType = bucketsWithKey
-                    .Single(bucket => bucket is IMessageBucket<T>) as IMessageBucket<T>;
+                    .Single(bucket => bucket is IMessageBucket<T, Signal>) as IMessageBucket<T, Signal>;
 
                 return bucketOfType.GetReader();
             }

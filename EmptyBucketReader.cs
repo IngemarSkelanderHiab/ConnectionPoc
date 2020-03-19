@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionPoc
 {
-    internal class EmptyBucketReader<T> : IBucketReader<T>
+    internal class EmptyBucketReader<T> : IBucketReader<T, Signal>
     {
         public Task<IReadOnlyCollection<T>> ReadAllAsync()
         {

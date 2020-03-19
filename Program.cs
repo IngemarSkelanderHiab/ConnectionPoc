@@ -14,22 +14,32 @@ namespace ConnectionPoc
             IConnectionManager connectionManager = new ConnectionManager();
             var connection = await connectionManager.CreateConnectionAsync(principal);
 
-            var parameterBucket = new ParameterBucket();
+            var signalBucket = new SignalBucket();
 
-            await parameterBucket.InsertAsync(new Parameter {Id = MessageId.Create(), Value = "1"});
-            await parameterBucket.InsertAsync(new Parameter {Id = MessageId.Create(), Value = "2"});
-            await parameterBucket.InsertAsync(new Parameter {Id = MessageId.Create(), Value = "3"});
+            await signalBucket.InsertAsync(new Signal {Id = MessageId.Create(), ParameterValue = "1", VariableValue = "11"});
+            await signalBucket.InsertAsync(new Signal { Id = MessageId.Create(), ParameterValue = "2", VariableValue = "22"});
+            await signalBucket.InsertAsync(new Signal { Id = MessageId.Create(), ParameterValue = "3", VariableValue = "33"});
 
-            IBucketManager bucketManager = new BucketManager();
-            bucketManager.Add(connection.Id, parameterBucket);
+            ISignalBucketManager bucketManager = new BucketManager();
+            bucketManager.Add(connection.Id, signalBucket);
 
-            var bucketReader = bucketManager.GetReader<Parameter>(connection.Id);
+            var parameterBucketReader = bucketManager.GetReader<Parameter>(connection.Id);
+            var variableBucketReader = bucketManager.GetReader<Variable>(connection.Id);
 
-            var parameters = await GetAllParametersAsync(bucketReader);
+            var parameters = await GetAllParametersAsync(parameterBucketReader);
+            var variables = await GetAllParametersAsync(variableBucketReader);
 
+            Console.WriteLine("Writing parameters");
             foreach (var parameter in parameters)
             {
                 Console.WriteLine(parameter);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Writing variables");
+            foreach (var variable in variables)
+            {
+                Console.WriteLine(variable);
             }
         }
 
@@ -56,11 +66,18 @@ namespace ConnectionPoc
             return connection;
         }
 
-        public static async Task<IReadOnlyCollection<Parameter>> GetAllParametersAsync(IBucketReader<Parameter> reader)
+        public static async Task<IReadOnlyCollection<Parameter>> GetAllParametersAsync(IBucketReader<Parameter, Signal> reader)
         {
             // IBucketReader reader = await bucketManager.GetReaderAsync(connectionId);
             var parameters = await reader.ReadAllAsync();
             return parameters;
+        }
+
+        public static async Task<IReadOnlyCollection<Variable>> GetAllParametersAsync(IBucketReader<Variable, Signal> reader)
+        {
+            // IBucketReader reader = await bucketManager.GetReaderAsync(connectionId);
+            var variables = await reader.ReadAllAsync();
+            return variables;
         }
     }
 }

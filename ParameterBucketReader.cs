@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace ConnectionPoc
 {
-    internal class ParameterBucketReader : IBucketReader<Parameter>
+    internal class ParameterBucketReader : IBucketReader<Parameter, Signal>
     {
-        private readonly IMessageBucket<Parameter> _bucket;
+        private readonly IMessageBucket<Parameter, Signal> _bucket;
 
-        public ParameterBucketReader(IMessageBucket<Parameter> bucket)
+        public ParameterBucketReader(IMessageBucket<Parameter, Signal> bucket)
         {
             _bucket = bucket;
         }
